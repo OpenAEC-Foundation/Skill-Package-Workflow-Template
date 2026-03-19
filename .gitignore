@@ -1,4 +1,32 @@
-node_modules/
+# OS
 .DS_Store
-*.log
+Thumbs.db
+Desktop.ini
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Build
+dist/
+build/
+
+# Environment
 .env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+
+# Claude (private session data)
+.claude/
+PROMPTS.md
+*.code-workspace

@@ -103,7 +103,18 @@ project-root/
 
 ---
 
-## Workspace Setup Protocol (P-000)
+## Privacy Protocol (P-000a)
+**PROMPTS.md is PRIVATE** — it contains user session prompts and internal agent task data.
+
+1. PROMPTS.md MUST be listed in `.gitignore` — NEVER commit or push it to GitHub
+2. `.claude/` directory MUST be listed in `.gitignore`
+3. `*.code-workspace` files MUST be listed in `.gitignore`
+4. Before ANY `git push`, verify that `git status` does NOT show PROMPTS.md as staged
+5. If PROMPTS.md was accidentally committed, remove it: `git rm --cached PROMPTS.md`
+
+---
+
+## Workspace Setup Protocol (P-000b)
 On FIRST session in a new workspace, ensure permissions are configured for autonomous operation:
 
 1. **Verify Bypass Permissions** — Check that `.claude/settings.json` has permissions allowing autonomous execution:
@@ -111,7 +122,8 @@ On FIRST session in a new workspace, ensure permissions are configured for auton
    { "permissions": { "allow": ["Bash(*)", "Read", "Write", "Edit", "Glob", "Grep", "WebFetch", "WebSearch", "Agent"] } }
    ```
    If not configured, create `.claude/settings.json` with these permissions.
-2. This enables agents to work without manual approval per tool call — critical for the batch delegation model.
+2. **Verify .gitignore** — Ensure PROMPTS.md, .claude/, and *.code-workspace are in `.gitignore`.
+3. This enables agents to work without manual approval per tool call — critical for the batch delegation model.
 
 ---
 
