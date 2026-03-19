@@ -387,17 +387,34 @@ Applied after EVERY batch during Phase 5:
 
 ---
 
+## Reflection Checkpoint (after every phase/batch)
+
+**MANDATORY**: After completing each phase or batch, PAUSE and ask these questions before proceeding:
+
+1. **Research sufficiency**: Did this phase reveal gaps in our understanding? Do we need additional research before continuing?
+2. **Scope reassessment**: Should we add, merge, or remove skills based on what we learned?
+3. **Plan revision**: Does our masterplan still make sense? Should batch ordering or dependencies change?
+4. **Quality reflection**: Are we meeting our quality bar? Is deterministic language consistent? Are anti-patterns being captured?
+5. **New discoveries**: Did we learn something that should become a LESSONS.md entry or a DECISIONS.md decision?
+
+**Decision**: If any answer is "yes", update the relevant core files BEFORE continuing to the next phase. If research needs expanding, return to Phase 2 or 4 for targeted deep-dives.
+
+**This prevents**: Building on incomplete understanding. The Tauri 2 package was completed in one session precisely because reflection checkpoints caught gaps early and expanded research where needed.
+
+---
+
 ## Document Sync Protocol
 
 After EVERY completed phase/batch:
 
-1. **ROADMAP.md** — Update status, percentage, next steps (MANDATORY)
-2. **LESSONS.md** — Log new patterns or discoveries (if any)
-3. **DECISIONS.md** — Record new architectural decisions (if any)
-4. **SOURCES.md** — Update verification dates (if researching)
-5. **CHANGELOG.md** — Add entry (if milestone reached)
-6. **Git commit** with message: `Phase X.Y: [action] [subject]`
-7. **README.md** — Update if skill count changed or milestone reached
+1. **REFLECTION CHECKPOINT** — Answer the 5 questions above (MANDATORY)
+2. **ROADMAP.md** — Update status, percentage, next steps (MANDATORY)
+3. **LESSONS.md** — Log new patterns or discoveries (if any)
+4. **DECISIONS.md** — Record new architectural decisions (if any)
+5. **SOURCES.md** — Update verification dates (if researching)
+6. **CHANGELOG.md** — Add entry (if milestone reached)
+7. **Git commit** with message: `Phase X.Y: [action] [subject]`
+8. **README.md** — Update if skill count changed or milestone reached
 
 Timing: IMMEDIATE after completion, not deferred.
 

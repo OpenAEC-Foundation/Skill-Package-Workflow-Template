@@ -196,16 +196,30 @@ Defined in detail in **WAY_OF_WORK.md** and **REQUIREMENTS.md**. Quick reference
 
 ---
 
+## Reflection Checkpoint Protocol (P-006a)
+MANDATORY after EVERY completed phase/batch — PAUSE and answer:
+
+1. **Research sufficiency**: Did this phase reveal gaps? Do we need more research?
+2. **Scope reassessment**: Should we add, merge, or remove skills?
+3. **Plan revision**: Does the masterplan still make sense? Change batch order?
+4. **Quality reflection**: Are we meeting our quality bar consistently?
+5. **New discoveries**: Anything for LESSONS.md or DECISIONS.md?
+
+If ANY answer is "yes" → update core files BEFORE continuing. If research needs expanding → return to Phase 2 or 4.
+
+---
+
 ## Document Sync Protocol (P-006)
 After EVERY completed phase/batch, update these files:
 
-1. **ROADMAP.md** — Status, percentage, changelog entry, next steps (MANDATORY)
-2. **LESSONS.md** — New patterns or discoveries (if any)
-3. **DECISIONS.md** — New architectural decisions (if any)
-4. **SOURCES.md** — New sources verified or dates updated (if researching)
-5. **CHANGELOG.md** — Milestone entries (for significant completions)
-6. Commit with message: `Phase X.Y: [action] [subject]`
-7. **README.md** — Check if landing page needs updating
+1. **REFLECTION CHECKPOINT** — Answer the 5 questions above (MANDATORY)
+2. **ROADMAP.md** — Status, percentage, changelog entry, next steps (MANDATORY)
+3. **LESSONS.md** — New patterns or discoveries (if any)
+4. **DECISIONS.md** — New architectural decisions (if any)
+5. **SOURCES.md** — New sources verified or dates updated (if researching)
+6. **CHANGELOG.md** — Milestone entries (for significant completions)
+7. Commit with message: `Phase X.Y: [action] [subject]`
+8. **README.md** — Check if landing page needs updating
 
 Timing: IMMEDIATE after completion, not deferred.
 
