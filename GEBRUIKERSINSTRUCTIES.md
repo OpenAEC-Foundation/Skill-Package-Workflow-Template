@@ -12,8 +12,17 @@ Je hebt nu een compleet ecosysteem van skill package repositories klaarstaan. El
 cd "C:\Users\Freek Heijting\Documents\GitHub\{Tech}-Claude-Skill-Package"
 ```
 
-### Stap 2: Start een Claude Code sessie
+### Stap 2: Zet permissions aan en start Claude Code
 
+**Eenmalig per repo**: Zet Bypass Permissions aan zodat Claude autonoom kan werken:
+
+```bash
+# Maak .claude/settings.json aan
+mkdir -p .claude
+echo '{ "permissions": { "allow": ["Bash(*)", "Read", "Write", "Edit", "Glob", "Grep", "WebFetch", "WebSearch", "Agent"] } }' > .claude/settings.json
+```
+
+Start daarna Claude Code:
 ```bash
 claude
 ```

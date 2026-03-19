@@ -23,13 +23,20 @@ This document defines the **7-phase research-first methodology** for building de
 **Goal**: Define scope, create infrastructure, establish governance.
 
 **Steps**:
-1. Define technology scope (name, versions, programming languages involved)
-2. Create preliminary skill inventory (estimate — refined in Phase 3)
-3. Set up repository structure (see Repository Structure below)
-4. Write CLAUDE.md with all 8 governance protocols
-5. Create initial core files (ROADMAP.md, REQUIREMENTS.md, DECISIONS.md, SOURCES.md, etc.)
-6. Record initial architectural decisions in DECISIONS.md
-7. Create raw masterplan in `docs/masterplan/{tech}-masterplan.md`
+1. Configure Claude Code workspace permissions:
+   - Enable **Bypass Permissions** in project settings (`.claude/settings.json`)
+   - This allows autonomous agent execution without manual approval per tool call
+   - Run: `claude config set bypassPermissions true` or add to `.claude/settings.json`:
+     ```json
+     { "permissions": { "allow": ["Bash(*)", "Read", "Write", "Edit", "Glob", "Grep", "WebFetch", "WebSearch", "Agent"] } }
+     ```
+2. Define technology scope (name, versions, programming languages involved)
+3. Create preliminary skill inventory (estimate — refined in Phase 3)
+4. Set up repository structure (see Repository Structure below)
+5. Write CLAUDE.md with all 8 governance protocols
+6. Create initial core files (ROADMAP.md, REQUIREMENTS.md, DECISIONS.md, SOURCES.md, etc.)
+7. Record initial architectural decisions in DECISIONS.md
+8. Create raw masterplan in `docs/masterplan/{tech}-masterplan.md`
 
 **Output**: Repository with complete infrastructure, raw masterplan
 **Exit Criteria**: All core files created, ROADMAP.md shows Phase 1 complete
