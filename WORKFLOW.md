@@ -285,7 +285,7 @@ description: >
   Prevents the [common mistake / anti-pattern this skill guards against].
   Covers [key topics, API areas, version differences].
   Keywords: [comma-separated technical terms users might type in their prompt].
-license: MIT
+license: {{LICENSE}}
 compatibility: "Designed for Claude Code. Requires {Technology} {versions}."
 metadata:
   author: OpenAEC-Foundation
@@ -518,6 +518,70 @@ Update ROADMAP.md next steps (CRITICAL for session recovery). Commit all changes
 
 ### P-008: Inter-Agent
 Agents spawned via Claude Code Agent tool. Results collected automatically.
+
+---
+
+## Operational Lessons (Cross-Package)
+
+Patterns discovered across multiple skill package projects. These are hard-won insights that prevent recurring mistakes.
+
+### YAML Frontmatter Gotchas
+
+The description field is the most error-prone part of SKILL.md. In the ERPNext package, 18 of 28 skills failed initial validation due to YAML issues.
+
+| Issue | Symptom | Fix |
+|-------|---------|-----|
+| Colon in value | `mapping values not allowed` | Use folded scalar `>` or quote the string |
+| Multi-line content | Truncated description | Use `>` (folded) or `|` (literal) block scalar |
+| Special characters | Parse errors | Quote + escape |
+| Embedded quotes | Nesting errors | Use opposite quote type |
+
+**Best practice**: ALWAYS use YAML folded block scalar (`>`) for descriptions. This avoids all quoting issues and is more readable than quoted strings.
+
+### Session Recovery Protocol
+
+Claude's context resets between sessions. When resuming work:
+
+1. **Scan repo state first** — `git log --oneline -10` + check ROADMAP.md
+2. **Compare expected vs actual** — what exists in the repo vs what ROADMAP says should exist
+3. **Identify the interruption point** — which files are complete, which are missing
+4. **Confirm with user before continuing** — never assume, always verify
+
+**Prevention**: Push after every batch. Update ROADMAP.md after every significant step. Atomic commits.
+
+### Context Window Overflow Management
+
+Large operations (batch validation of 20+ skills, large research documents) can overflow the context window mid-session.
+
+**Prevention**:
+- Push incrementally (after each file, not at the end)
+- Monitor output size during batch operations
+- Checkpoint commits between batches
+- Maximum 5-10 files per conversation segment
+
+**Recovery**: Same as session recovery — scan GitHub state, identify gaps, communicate and resume.
+
+### Testing Is Not Optional
+
+The ERPNext package was declared "100% complete" at structural level but had never been functionally tested. This led to a retrofit phase.
+
+**Rule**: Build validation into the workflow, not as a final phase. After every batch:
+1. Structural validation (YAML parsing, line counts)
+2. At minimum: sample-test 1 skill per category in a real Claude conversation
+3. Verify trigger activation and code generation quality
+
+### Frontmatter Migration Pattern
+
+When upgrading existing packages to a new standard (e.g., adding `license`, `compatibility`, `metadata` fields):
+
+1. **Audit first** — document what's missing vs the target format
+2. **Batch by category** — parallelize with agents (3 agents, separated file scopes)
+3. **Verify after** — spot-check files across categories
+4. **Commit atomically** — one commit for the entire migration, not per-file
+
+### License Field in Frontmatter
+
+The SKILL.md template defaults to MIT, but packages may use different licenses (ERPNext uses LGPL-3.0). Always match the frontmatter `license` field to the repository's actual LICENSE file.
 
 ---
 

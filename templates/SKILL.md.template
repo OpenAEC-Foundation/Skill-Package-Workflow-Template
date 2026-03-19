@@ -5,7 +5,7 @@ description: >
   Prevents the [common mistake / anti-pattern this skill guards against].
   Covers [key topics, API areas, version differences].
   Keywords: [comma-separated technical terms users might type in their prompt].
-license: MIT
+license: {{LICENSE}}
 compatibility: "Designed for Claude Code. Requires {{TECHNOLOGY}} {{VERSIONS}}."
 metadata:
   author: OpenAEC-Foundation
