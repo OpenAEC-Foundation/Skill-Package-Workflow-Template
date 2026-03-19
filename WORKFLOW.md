@@ -10,6 +10,8 @@ This document defines the **7-phase research-first methodology** for building de
 | Blender-Bonsai | 73 | 4 (Blender, IfcOpenShell, Bonsai, Sverchok) | 2 days |
 | Tauri 2 | 27 | 1 (Tauri 2.x) | 1 day |
 | Vite | 22 | 1 (Vite 6/7/8) | 1 session |
+| PDFjs | 13 | 1 (pdfjs-dist 5.x) | 1 session |
+| + 4 more | 91 | Various | Various |
 
 **Core principle**: You cannot create deterministic skills for something you don't deeply understand.
 
@@ -154,9 +156,9 @@ This document defines the **7-phase research-first methodology** for building de
 
 ---
 
-### Phase 7: Publication
+### Phase 7: Publication + Compliance Audit
 
-**Goal**: Finalize package for public release on GitHub.
+**Goal**: Finalize package for public release AND verify methodology compliance.
 
 **Steps**:
 1. Create INDEX.md (complete skill catalog with descriptions and trigger scenarios)
@@ -187,7 +189,7 @@ This document defines the **7-phase research-first methodology** for building de
    # → https://github.com/OpenAEC-Foundation/{repo}/settings → Social preview → Edit
    ```
 5. Update ROADMAP.md to 100%
-6. Update CHANGELOG.md (v1.0.0 entry)
+6. Update CHANGELOG.md (v1.0.0 entry: `[Unreleased]` → `[1.0.0] - YYYY-MM-DD`)
 7. Create release tag:
    ```bash
    git tag -a v1.0.0 -m "v1.0.0: {X} deterministic skills for {Technology}"
@@ -201,8 +203,15 @@ This document defines the **7-phase research-first methodology** for building de
    - Topics are set
    - License is visible
 
-**Output**: Published GitHub repository with social preview, release tag, complete README
-**Exit Criteria**: Repository public, discoverable, installable
+9. **MANDATORY: Run Compliance Audit** (see Compliance Audit section below)
+   - Spawn audit agent to check ALL 7 phases
+   - If audit score < 90%: auto-remediate all fixable issues
+   - Re-audit after remediation to confirm fixes
+   - Commit remediation: `audit: remediate methodology gaps`
+   - Push final state
+
+**Output**: Published GitHub repository with social preview, release tag, complete README, passing compliance audit
+**Exit Criteria**: Repository public, discoverable, installable, audit score ≥ 90%
 
 ---
 
@@ -479,6 +488,61 @@ Timing: IMMEDIATE after completion, not deferred.
 | 3 | Technical | Validation passes, all references linked |
 | 4 | Functional | Skills load, triggers work, code generation tested |
 | 5 | Production | Real-world projects validated, user feedback incorporated |
+
+---
+
+## Compliance Audit (mandatory at end of Phase 7)
+
+Every skill package MUST pass a compliance audit before it is considered complete. The audit checks all 7 phases and auto-remediates fixable issues.
+
+### How to run
+
+Use the prompt from `templates/methodology-audit.md.template`. Copy the prompt section and run it in Claude Code from within the target skill package repo.
+
+### What it checks
+
+The audit covers 50+ checks across all 7 phases:
+
+| Area | Key Checks |
+|------|-----------|
+| **Phase 1** | Core files exist, DECISIONS.md populated, masterplan exists |
+| **Phase 2** | Vooronderzoek exists AND is committed, SOURCES.md updated, separate commit |
+| **Phase 3** | Masterplan skill count matches disk, refinement decisions in DECISIONS.md |
+| **Phase 4** | Topic research exists OR documented decision to use inline WebFetch |
+| **Phase 5** | All skills present, frontmatter uses `>` scalar, English-only, deterministic |
+| **Phase 6** | Validation pass documented, cross-references valid, no broken links |
+| **Phase 7** | INDEX.md, README.md, banner, CHANGELOG versioned, tag, release, topics |
+| **Cross-cutting** | ROADMAP consistent with git, LESSONS.md multi-phase, SOURCES.md verified |
+
+### YAML Frontmatter Standard
+
+All SKILL.md descriptions MUST use YAML folded block scalar (`>`):
+
+```yaml
+# CORRECT — folded block scalar
+description: >
+  Use when [trigger scenario]. Prevents [anti-pattern].
+  Covers [scope]. Keywords: [terms].
+
+# WRONG — quoted string (legacy, must be migrated)
+description: "Quoted string description..."
+```
+
+### Pass criteria
+
+- **≥ 90%**: PASS — package is compliant
+- **70-89%**: PARTIAL — auto-remediate, then re-audit
+- **< 70%**: FAIL — significant rework needed, re-run phases from first failure point
+
+### Auto-remediation
+
+The audit prompt includes remediation logic that:
+1. Identifies the first broken phase
+2. Re-executes all phases from that point forward (using masterplan agent prompts)
+3. Fixes governance file inconsistencies
+4. Migrates YAML frontmatter to `>` format
+5. Re-audits to confirm fixes
+6. Commits and pushes all changes
 
 ---
 

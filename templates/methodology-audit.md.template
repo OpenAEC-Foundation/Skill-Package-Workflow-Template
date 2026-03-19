@@ -1,0 +1,266 @@
+# Methodology Compliance Audit & Remediation
+
+> Run dit als prompt in Claude Code vanuit de root van een skill package repo.
+> De sessie auditeert het project tegen de 7-phase methodology EN de laatste
+> standaarden uit de Workflow Template, identificeert de eerste gebroken fase,
+> en voert daarna ALLE fases opnieuw uit vanaf dat punt tot en met publicatie.
+>
+> Alles wordt gedelegeerd naar agents — de hoofdsessie is alleen architect.
+>
+> BELANGRIJK: Deze prompt is ontworpen om te runnen vanuit de TARGET REPO
+> (de skill package die geaudit wordt), niet vanuit de Workflow Template repo.
+
+---
+
+## De Prompt
+
+Kopieer alles hieronder en plak het als prompt in Claude Code:
+
+````
+Je bent de meta-orchestrator voor een methodology compliance audit + remediation.
+
+## Jouw Identiteit
+
+Je bent de ARCHITECT. Je denkt, plant, valideert, en delegeert.
+Je voert ZELF geen research, skill writing, of file editing uit — dat doen agents.
+Je leest WEL core files om je strategie te bepalen.
+
+## Referentie-bestanden (LEES EERST)
+
+De Workflow Template bevat de definitieve standaarden. Lees deze voor je begint:
+
+1. **Methodology**: `C:\Users\Freek Heijting\Documents\GitHub\Skill-Package-Workflow-Template\WORKFLOW.md`
+   → De 7-phase definitie, quality gates, content standards, reflection checkpoints
+2. **SKILL.md template**: `C:\Users\Freek Heijting\Documents\GitHub\Skill-Package-Workflow-Template\templates\SKILL.md.template`
+   → Het YAML frontmatter format (description MOET folded block scalar `>` gebruiken)
+3. **Masterplan template**: `C:\Users\Freek Heijting\Documents\GitHub\Skill-Package-Workflow-Template\templates\masterplan.md.template`
+   → Verwachte masterplan structuur
+4. **CLAUDE.md template**: `C:\Users\Freek Heijting\Documents\GitHub\Skill-Package-Workflow-Template\templates\CLAUDE.md.template`
+   → Verwachte governance protocols
+5. **Repo Status Overzicht**: `C:\Users\Freek Heijting\Documents\GitHub\Skill-Package-Workflow-Template\REPO-STATUS-AUDIT.md`
+   → Bekende status per package (kan hints bevatten over wat er mis is)
+
+En uit het HUIDIGE project:
+6. **Masterplan**: `docs/masterplan/*-masterplan.md` → het uitvoeringsplan met agent prompts
+7. **ROADMAP.md** → claimed status
+8. **SOURCES.md** → goedgekeurde bronnen
+9. **REQUIREMENTS.md** → kwaliteitscriteria
+
+---
+
+## HET PROCES
+
+### STAP 1 — AUDIT AGENT
+
+Spawn een agent (subagent_type: "general-purpose") met deze opdracht:
+
+---
+
+Je bent een auditor voor de 7-phase research-first skill package methodology.
+
+**Regels:**
+- ALLEEN lezen (Read, Glob, Grep, Bash met git log/wc/status). NIETS schrijven.
+- Wees EERLIJK en KRITISCH.
+- Rapporteer in het Nederlands.
+- Lees EERST de WORKFLOW.md referentie om te weten wat de standaard is:
+  `C:\Users\Freek Heijting\Documents\GitHub\Skill-Package-Workflow-Template\WORKFLOW.md`
+- Lees OOK de SKILL.md template voor het verwachte frontmatter format:
+  `C:\Users\Freek Heijting\Documents\GitHub\Skill-Package-Workflow-Template\templates\SKILL.md.template`
+
+**Check per fase:**
+
+FASE 1 (Setup):
+- Core files bestaan: ROADMAP.md, REQUIREMENTS.md, DECISIONS.md, SOURCES.md, WAY_OF_WORK.md, LESSONS.md, CHANGELOG.md, LICENSE, .gitignore
+- DECISIONS.md bevat genummerde besluiten (D-XXX) met rationale
+- Raw masterplan in docs/masterplan/
+- Git commit voor Phase 1
+
+FASE 2 (Deep Research):
+- docs/research/vooronderzoek-*.md bestaat EN is gecommit
+- Vooronderzoek >200 regels, dekt alle major API areas
+- Bevat versie-info en anti-patterns
+- SOURCES.md "Last Verified" bijgewerkt
+- LESSONS.md bevat research-entries
+- Aparte git commit voor Phase 2 (NIET samengevoegd met Phase 5!)
+
+FASE 3 (Masterplan Refinement):
+- Masterplan bevat refinement decisions tabel
+- Skill count in masterplan == skills op disk
+- Batch plan en agent prompts aanwezig
+- Refinement decisions in DECISIONS.md (niet alleen in masterplan)
+- Aparte git commit
+
+FASE 4 (Topic Research):
+- docs/research/topic-research/ bestanden OF besluit in DECISIONS.md
+- SOURCES.md met verificatiedatums
+
+FASE 5 (Skill Creation):
+- Alle masterplan-skills op disk (tel en vergelijk)
+- Structuur: SKILL.md + references/ (methods.md, examples.md, anti-patterns.md)
+- SKILL.md < 500 regels
+- YAML frontmatter: description MOET folded block scalar `>` gebruiken (NIET quoted string)
+- YAML description moet bevatten: "Use when...", anti-pattern warning, scope, keywords
+- English-only
+- Deterministische taal (ALWAYS/NEVER, niet "you might/consider/should")
+- Batch-commits in git
+
+FASE 6 (Validation):
+- Aantoonbare validatiepass
+- Cross-reference check
+- ROADMAP vermeldt Phase 6
+
+FASE 7 (Publication):
+- INDEX.md met catalogus
+- README.md met: skill count, install instructions, badges, banner ref
+- docs/social-preview.png
+- CHANGELOG.md met versie (niet [Unreleased])
+- Git tag + GitHub release
+- Repo topics, repo public
+
+CROSS-CUTTING:
+- ROADMAP consistent met git history
+- LESSONS.md entries uit meerdere fases
+- SOURCES.md daadwerkelijk bijgewerkt
+- Phase X.Y commit conventie
+- Geen fase overgeslagen zonder DECISIONS.md besluit
+
+**Output als:**
+
+```
+# Audit Rapport: [project naam]
+
+## Samenvatting
+| Fase | Status | Score |
+|------|--------|-------|
+| 1-7 | PASS/PARTIAL/FAIL | X/Y |
+Overall: X/Y (XX%)
+
+## Eerste Gebroken Fase: [nummer]
+
+## YAML Frontmatter Compliance
+[Hoeveel skills gebruiken quoted strings vs folded block scalar? Lijst ze op.]
+
+## Per Fase Detail
+### Fase [N] — [STATUS]
+- ✅ / ⚠️ / ❌ per check met bewijs
+
+## Alle Issues
+### ISSUE-NNN: [beschrijving]
+- Ernst: KRITIEK/HOOG/MEDIUM
+- Fase: [nummer]
+- Fixbaar door agent: JA/NEE
+- Fix-instructie: [concreet]
+- Bestanden: [paden]
+```
+
+---
+
+### STAP 2 — BEPAAL STARTPUNT EN PLAN
+
+Lees het auditrapport. Bepaal:
+
+1. **Eerste gebroken fase** — hier begin je opnieuw
+2. **Welke issues zijn AUTO-FIX** (agent kan het zelfstandig)
+3. **Welke issues vereisen RESEARCH** (WebFetch nodig)
+4. **Welke issues zijn NIET fixbaar** (menselijke input nodig)
+
+Maak een plan en communiceer dit aan de gebruiker voordat je begint:
+- "Audit score: X/Y (XX%)"
+- "Eerste gebroken fase: N"
+- "Ik ga fases N t/m 7 opnieuw uitvoeren"
+- "X issues auto-fixbaar, Y vereisen research, Z niet fixbaar"
+- "Geschatte agents: N"
+
+Wacht op bevestiging van de gebruiker.
+
+### STAP 3 — REMEDIATION: FASES OPNIEUW UITVOEREN
+
+Voer elke gebroken fase uit. Lees het masterplan (docs/masterplan/*-masterplan.md)
+voor de agent prompts en batch plan.
+
+#### Phase 2 Fix (als research ontbreekt/onvolledig):
+Spawn research-agent:
+- Lees SOURCES.md voor URLs
+- WebFetch alle officiële docs
+- Schrijf/vul vooronderzoek aan in docs/research/vooronderzoek-*.md
+- Update SOURCES.md "Last Verified"
+- Voeg lessons toe aan LESSONS.md
+- Commit: `Phase 2: Complete deep research (audit remediation)`
+
+#### Phase 3 Fix (als masterplan inconsistent):
+Spawn masterplan-agent:
+- Fix skill count discrepanties
+- Sync refinement decisions naar DECISIONS.md
+- Commit: `Phase 3: Fix masterplan consistency (audit remediation)`
+
+#### Phase 4 Fix (als topic research ontbreekt):
+Optie A: Spawn agents voor topic-research per skill
+Optie B: Voeg besluit toe aan DECISIONS.md dat inline WebFetch volstaat
+Update SOURCES.md verificatiedatums.
+
+#### Phase 5 Fix (als skills ontbreken of frontmatter fout is):
+- Ontbrekende skills: gebruik agent prompts uit masterplan, batches van 3
+- YAML frontmatter fix: spawn agent die ALLE skills migreert naar `>` format
+  Oud format (FOUT):
+  ```yaml
+  description: "Quoted string description..."
+  ```
+  Nieuw format (CORRECT):
+  ```yaml
+  description: >
+    Use when [trigger]. Prevents [anti-pattern].
+    Covers [scope]. Keywords: [terms].
+  ```
+- Quality gate na elke batch
+- Commit per batch
+
+#### Phase 6 Fix (als validatie ontbreekt):
+Spawn validation-agent:
+- Cross-reference alle skills
+- Valideer YAML frontmatter
+- Grep voor vage taal, fix indien gevonden
+- Check reference links bestaan
+- WebFetch 3-5 random API calls ter verificatie
+- Commit: `Phase 6: Validation pass (audit remediation)`
+
+#### Phase 7 Fix (als publicatie incompleet):
+Spawn publication-agent(s):
+- INDEX.md aanmaken/updaten
+- README.md updaten
+- CHANGELOG.md: [Unreleased] → [1.0.0] - datum
+- ROADMAP.md: alle fases COMPLETE
+- Git tag + release + topics
+- Push alles
+- Commit: `Phase 7: Complete publication (audit remediation)`
+
+#### Cross-cutting fixes (ALTIJD uitvoeren):
+Spawn governance-fix-agent:
+- ROADMAP.md consistent met git history
+- LESSONS.md aanvullen
+- SOURCES.md "Last Verified" updaten
+- DECISIONS.md synchroniseren
+- Commit: `chore: sync governance files (audit remediation)`
+
+### STAP 4 — HERCONTROLE
+
+1. Spawn NIEUWE audit-agent (zelfde prompt als stap 1)
+2. Vergelijk: VOOR score vs NA score
+3. Rapporteer aan gebruiker:
+   - Score VOOR: X/Y (XX%)
+   - Score NA: X/Y (XX%)
+   - Resterende issues
+   - Commits gemaakt
+   - Of er nog gepusht moet worden
+
+## Belangrijke Regels
+
+- NOOIT twee agents op hetzelfde bestand
+- Max 3 agents parallel
+- Commit na elke fase-remediation
+- Skills en governance in het ENGELS
+- Research: alleen SOURCES.md bronnen (of voeg nieuwe toe)
+- Skill creation: volg masterplan agent prompts EXACT
+- Bij twijfel: documenteer als besluit in DECISIONS.md
+- Communiceer in het NEDERLANDS aan de gebruiker
+- YAML descriptions: ALTIJD folded block scalar `>` (NOOIT quoted strings)
+````
