@@ -9,6 +9,7 @@ This document defines the **7-phase research-first methodology** for building de
 | ERPNext | 28 | 1 (ERPNext/Frappe) | Multi-session |
 | Blender-Bonsai | 73 | 4 (Blender, IfcOpenShell, Bonsai, Sverchok) | 2 days |
 | Tauri 2 | 27 | 1 (Tauri 2.x) | 1 day |
+| Vite | 22 | 1 (Vite 6/7/8) | 1 session |
 
 **Core principle**: You cannot create deterministic skills for something you don't deeply understand.
 
@@ -181,7 +182,9 @@ This document defines the **7-phase research-first methodology** for building de
    # Set repository topics
    gh repo edit --add-topic claude,skills,{tech},ai,deterministic
 
-   # Upload social preview via GitHub Settings > General > Social Preview
+   # Social preview: PNG is auto-generated via Chrome headless from HTML template.
+   # Upload requires GitHub web UI (no public API exists):
+   # → https://github.com/OpenAEC-Foundation/{repo}/settings → Social preview → Edit
    ```
 5. Update ROADMAP.md to 100%
 6. Update CHANGELOG.md (v1.0.0 entry)
@@ -277,7 +280,11 @@ skill-name/
 ```yaml
 ---
 name: {prefix}-{category}-{topic}
-description: "Use this skill when Claude needs to [trigger scenario]. Covers [API area], [patterns], [anti-patterns]."
+description: >
+  Use when [specific trigger scenario -- what the user is doing or asking].
+  Prevents the [common mistake / anti-pattern this skill guards against].
+  Covers [key topics, API areas, version differences].
+  Keywords: [comma-separated technical terms users might type in their prompt].
 license: MIT
 compatibility: "Designed for Claude Code. Requires {Technology} {versions}."
 metadata:
@@ -300,6 +307,32 @@ metadata:
 - [Complete API Reference](references/methods.md)
 - [Working Examples](references/examples.md)
 - [Anti-Patterns](references/anti-patterns.md)
+```
+
+### Description Field (trigger-optimized format)
+
+The `description` is the most important field -- Claude uses it to decide whether to load a skill. Every description MUST follow this structure:
+
+1. **"Use when..."** -- tells Claude exactly when to activate (action-oriented, not "Documents..." or "Covers...")
+2. **Anti-pattern warning** -- the specific mistake this skill prevents ("Prevents the common mistake of...", "Avoids the #1 pitfall:")
+3. **Scope summary** -- what the skill covers (brief)
+4. **Keywords** -- technical terms that match user prompts (function names, error messages, library names)
+
+**Use YAML folded block scalar (`>`)** for multi-line descriptions. This is more readable than quoted strings.
+
+**Good example:**
+```yaml
+description: >
+  Use when writing IfcOpenShell Python code that creates, modifies, or deletes
+  IFC entities. Prevents the #1 AI mistake: using create_entity() directly
+  instead of ifcopenshell.api.run(). Covers all 30+ API modules, parameter
+  conventions, and version differences.
+  Keywords: IFC, BIM, ifcopenshell, api.run, create_entity, IfcWall, IfcSlab.
+```
+
+**Bad example (passive, no triggers):**
+```yaml
+description: "Documents the ifcopenshell.api module system with all 30+ API modules and invocation patterns."
 ```
 
 ### Naming Convention

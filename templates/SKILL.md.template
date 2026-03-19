@@ -1,0 +1,82 @@
+---
+name: {{PREFIX}}-{{CATEGORY}}-{{TOPIC}}
+description: >
+  Use when [specific trigger scenario -- what the user is doing or asking].
+  Prevents the [common mistake / anti-pattern this skill guards against].
+  Covers [key topics, API areas, version differences].
+  Keywords: [comma-separated technical terms users might type in their prompt].
+license: MIT
+compatibility: "Designed for Claude Code. Requires {{TECHNOLOGY}} {{VERSIONS}}."
+metadata:
+  author: OpenAEC-Foundation
+  version: "1.0"
+---
+
+# {{Skill Title}}
+
+## Quick Reference
+
+> **CRITICAL**: [Most important warning or rule for this skill area]
+
+### Decision Tree
+
+```
+[User question/task] -->
+  If [condition A] --> Use [pattern A]
+  If [condition B] --> Use [pattern B]
+  If [condition C] --> NEVER do [anti-pattern], instead [correct approach]
+```
+
+### API Overview
+
+| Function/Method | Purpose | Version |
+|----------------|---------|---------|
+| `example_func()` | What it does | v1.0+ |
+
+## Essential Patterns
+
+### Pattern 1: [Name]
+
+```python
+# [Blender 4.x+ / IfcOpenShell / etc.]
+# [Brief description of what this does]
+```
+
+### Pattern 2: [Name]
+
+```python
+# [Version annotation]
+# [Brief description]
+```
+
+## Common Operations
+
+### [Operation 1]
+
+```python
+# [Working code snippet]
+```
+
+### [Operation 2]
+
+```python
+# [Working code snippet]
+```
+
+## Anti-Patterns
+
+### [Anti-Pattern Name]
+
+```python
+# WRONG -- [why this fails]
+bad_example()
+
+# CORRECT -- [why this works]
+good_example()
+```
+
+## Reference Links
+
+- [Complete API Reference](references/methods.md)
+- [Working Examples](references/examples.md)
+- [Anti-Patterns](references/anti-patterns.md)

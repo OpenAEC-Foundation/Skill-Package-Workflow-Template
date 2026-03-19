@@ -91,7 +91,7 @@ Na fase 7 heb je:
 | Docker | Containerization | ⏳ Klaar voor start |
 | Nextcloud | Cloud platform | ⏳ Klaar voor start |
 | React | UI component library | ⏳ Klaar voor start |
-| Vite | Frontend build tool | ⏳ Klaar voor start |
+| Vite | Frontend build tool | ✅ Compleet (22 skills) |
 | SolidJS | Reactive UI framework | ⏳ Klaar voor start |
 | Fluent-i18n | Mozilla i18n system | ⏳ Klaar voor start |
 | pdf-lib | PDF creation library | ⏳ Klaar voor start |
