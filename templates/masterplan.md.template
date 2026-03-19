@@ -1,0 +1,206 @@
+# {{TECH_FULL_NAME}} Skill Package — Definitive Masterplan
+
+## Status
+
+Phase 3 complete. Finalized from raw masterplan after vooronderzoek review.
+Date: {{DATE}}
+
+---
+
+## Decisions Made During Refinement
+
+<!-- Document every merge, addition, removal, and reorder decision made during Phase 3 -->
+
+| # | Decision | Rationale |
+|---|----------|-----------|
+| D-01 | **Merged** `{{prefix}}-X` into `{{prefix}}-Y` | [Why these overlap and combining improves user experience] |
+| D-02 | **Added** `{{prefix}}-new-skill` | [Why research revealed a gap that needs its own skill] |
+| D-03 | **Removed** `{{prefix}}-old-skill` | [Why the API surface is too thin or covered elsewhere] |
+| D-04 | **Reordered** batches to respect dependency chains | [What dependency was discovered] |
+
+**Result**: {{RAW_COUNT}} raw skills → **{{FINAL_COUNT}} definitive skills** (X merges, Y additions, Z removals).
+
+---
+
+## Definitive Skill Inventory ({{FINAL_COUNT}} skills)
+
+<!-- For each category, create a table with these EXACT columns -->
+
+### {{prefix}}-core/ (N skills)
+
+| Name | Scope | Key APIs | Research Input | Complexity | Dependencies |
+|------|-------|----------|----------------|------------|-------------|
+| `{{prefix}}-core-architecture` | Architecture overview; core concepts; design philosophy; key types | [Main types/classes] | Vooronderzoek §X | M | None |
+| `{{prefix}}-core-config` | Configuration reference; all options; minimal viable config | [Config keys/files] | Vooronderzoek §X | L | None |
+
+### {{prefix}}-syntax/ (N skills)
+
+| Name | Scope | Key APIs | Research Input | Complexity | Dependencies |
+|------|-------|----------|----------------|------------|-------------|
+| `{{prefix}}-syntax-{topic}` | [Exact scope — what this skill covers] | [API signatures] | Vooronderzoek §X | M/L/S | [Which skills must exist first] |
+
+### {{prefix}}-impl/ (N skills)
+
+| Name | Scope | Key APIs | Research Input | Complexity | Dependencies |
+|------|-------|----------|----------------|------------|-------------|
+| `{{prefix}}-impl-{topic}` | [Step-by-step workflow for this task] | [Tools/methods used] | Vooronderzoek §X | M/L | [Which syntax skills are prerequisites] |
+
+### {{prefix}}-errors/ (N skills)
+
+| Name | Scope | Key APIs | Research Input | Complexity | Dependencies |
+|------|-------|----------|----------------|------------|-------------|
+| `{{prefix}}-errors-{topic}` | [Error domain covered] | [Error types/messages] | Vooronderzoek §X | M | [Related syntax/impl skills] |
+
+### {{prefix}}-agents/ (2 skills)
+
+| Name | Scope | Key APIs | Research Input | Complexity | Dependencies |
+|------|-------|----------|----------------|------------|-------------|
+| `{{prefix}}-agents-review` | Validation checklist for generated code; anti-pattern detection | All validation rules | Vooronderzoek §anti-patterns | M | ALL syntax + impl skills |
+| `{{prefix}}-agents-project-scaffolder` | Generate complete project structure; configure all components | All scaffolding patterns | Vooronderzoek §architecture | L | ALL core + syntax skills |
+
+---
+
+## Batch Execution Plan (DEFINITIVE)
+
+<!--
+Rules for batching:
+- 3 skills per batch (optimal for Claude Code Agent tool)
+- Foundation skills (core/) first, no dependencies
+- syntax/ skills second, depend on core/
+- impl/ skills third, depend on syntax/
+- errors/ skills fourth, depend on related syntax/impl
+- agents/ LAST, depend on ALL other skills
+-->
+
+| Batch | Skills | Count | Dependencies | Notes |
+|-------|--------|-------|-------------|-------|
+| 1 | `core-architecture`, `core-config` | 2 | None | Foundation, no deps |
+| 2 | `core-*`, `syntax-*` | 2-3 | Batch 1 | Core + primary syntax |
+| 3 | `syntax-*` | 3 | Batch 1-2 | More syntax patterns |
+| ... | ... | ... | ... | ... |
+| N-1 | `errors-*` | 2-3 | Related batches | Error handling |
+| N | `agents-review`, `agents-project-scaffolder` | 2 | ALL above | Agent skills last |
+
+**Total**: {{FINAL_COUNT}} skills across {{BATCH_COUNT}} batches.
+
+---
+
+## Per-Skill Agent Prompts
+
+### Constants
+
+```
+PROJECT_ROOT = C:\Users\Freek Heijting\Documents\GitHub\{{GITHUB_REPO_NAME}}
+RESEARCH_FILE = C:\Users\Freek Heijting\Documents\GitHub\{{GITHUB_REPO_NAME}}\docs\research\vooronderzoek-{{prefix}}.md
+REQUIREMENTS_FILE = C:\Users\Freek Heijting\Documents\GitHub\{{GITHUB_REPO_NAME}}\REQUIREMENTS.md
+REFERENCE_SKILL = C:\Users\Freek Heijting\Documents\GitHub\Tauri-2-Claude-Skill-Package\skills\source\tauri-core\tauri-core-architecture\SKILL.md
+```
+
+---
+
+### Batch 1
+
+#### Prompt: {{prefix}}-core-architecture
+
+```
+## Task: Create the {{prefix}}-core-architecture skill
+
+### Output Directory
+{{PROJECT_ROOT}}\skills\source\{{prefix}}-core\{{prefix}}-core-architecture\
+
+### Files to Create
+1. SKILL.md (main skill file, <500 lines)
+2. references/methods.md (API signatures for core types/classes)
+3. references/examples.md (working code examples)
+4. references/anti-patterns.md (what NOT to do)
+
+### Reference Format
+Read and follow the structure of:
+{{REFERENCE_SKILL}}
+
+### YAML Frontmatter
+---
+name: {{prefix}}-core-architecture
+description: "[Trigger-rich description covering when this skill activates]"
+license: MIT
+compatibility: "Designed for Claude Code. Requires {{TECH_FULL_NAME}} {{TECH_VERSIONS}}."
+metadata:
+  author: OpenAEC-Foundation
+  version: "1.0"
+---
+
+### Scope (EXACT — do not exceed)
+- [Bullet point 1: specific API/concept covered]
+- [Bullet point 2: specific API/concept covered]
+- [Bullet point 3: specific API/concept covered]
+
+### Research Sections to Read
+From vooronderzoek-{{prefix}}.md:
+- Section X: [Topic] (lines N-M)
+- Section Y: [Topic] (lines N-M)
+
+### Quality Rules
+- English only
+- SKILL.md < 500 lines; heavy content goes in references/
+- Use ALWAYS/NEVER deterministic language, not "you should" or "consider"
+- All code examples must be verified against vooronderzoek research
+- Include version annotations
+- Include Critical Warnings section with NEVER rules
+```
+
+<!--
+REPEAT this prompt template for EVERY skill in the inventory.
+Each prompt MUST include:
+1. Exact output directory path
+2. Files to create (SKILL.md + 3 reference files)
+3. Reference skill to follow for format
+4. Complete YAML frontmatter with trigger-rich description
+5. EXACT scope with bullet points (do not exceed)
+6. Research sections with line numbers
+7. Quality rules (English, <500 lines, ALWAYS/NEVER, version annotations)
+-->
+
+---
+
+## Appendix: Skill Directory Structure
+
+```
+skills/source/
+├── {{prefix}}-core/
+│   ├── {{prefix}}-core-architecture/
+│   │   ├── SKILL.md
+│   │   └── references/
+│   │       ├── methods.md
+│   │       ├── examples.md
+│   │       └── anti-patterns.md
+│   └── {{prefix}}-core-config/
+│       ├── SKILL.md
+│       └── references/
+├── {{prefix}}-syntax/
+│   ├── {{prefix}}-syntax-{topic}/
+│   └── ...
+├── {{prefix}}-impl/
+│   ├── {{prefix}}-impl-{topic}/
+│   └── ...
+├── {{prefix}}-errors/
+│   ├── {{prefix}}-errors-{topic}/
+│   └── ...
+└── {{prefix}}-agents/
+    ├── {{prefix}}-agents-review/
+    └── {{prefix}}-agents-project-scaffolder/
+```
+
+---
+
+## Reference: Tauri 2 Masterplan (proven example)
+
+The Tauri 2 Skill Package masterplan at:
+`C:\Users\Freek Heijting\Documents\GitHub\Tauri-2-Claude-Skill-Package\docs\masterplan\tauri-masterplan.md`
+
+Contains a COMPLETE, PROVEN example of this template with:
+- 27 definitive skills across 10 batches
+- 8 refinement decisions (merges, additions, removals)
+- Full agent prompts with exact scope, research sections, and quality rules
+- Successfully executed in a single session
+
+Study this file for format, detail level, and prompt structure when creating your masterplan.
