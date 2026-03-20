@@ -2,16 +2,21 @@
 
 ## Overview
 
-This document defines the **7-phase research-first methodology** for building deterministic Claude skill packages. Proven across three production packages:
+This document defines the **7-phase research-first methodology** for building deterministic Claude skill packages. Proven across 10+ production packages:
 
 | Package | Skills | Technologies | Timeline |
 |---------|--------|-------------|----------|
-| ERPNext | 28 | 1 (ERPNext/Frappe) | Multi-session |
 | Blender-Bonsai | 73 | 4 (Blender, IfcOpenShell, Bonsai, Sverchok) | 2 days |
+| ERPNext | 28 | 1 (ERPNext/Frappe) | Multi-session |
 | Tauri 2 | 27 | 1 (Tauri 2.x) | 1 day |
+| Nextcloud | 24 | 1 (Nextcloud/WebDAV) | 1 session |
+| React | 24 | 1 (React 18/19) | 1 session |
+| Draw.io | 22 | 1 (Draw.io/diagrams.net) | 1 session |
 | Vite | 22 | 1 (Vite 6/7/8) | 1 session |
-| PDFjs | 13 | 1 (pdfjs-dist 5.x) | 1 session |
-| + 4 more | 91 | Various | Various |
+| Docker | 22 | 1 (Docker/Compose) | 1 session |
+| n8n | 21 | 1 (n8n workflow automation) | 1 session |
+| + 3 more | 48 | Various | Various |
+| **Totaal** | **311** | | |
 
 **Core principle**: You cannot create deterministic skills for something you don't deeply understand.
 
@@ -19,40 +24,82 @@ This document defines the **7-phase research-first methodology** for building de
 
 ---
 
+## How It Works — The Big Picture
+
+```
+Phase 1          Phase 2          Phase 3          Phase 4+5         Phase 6      Phase 7
+BOOTSTRAP &      DEEP             MASTERPLAN       TOPIC RESEARCH    VALIDATION   PUBLICATION
+RAW MASTERPLAN   RESEARCH         REFINEMENT       + SKILL CREATION  + AUDIT      + RELEASE
+
+Gather input     Investigate      Finalize plan    Build in batches  Test         Ship
+→ Topics         → Sub-topics     → Sub-phases     → 3 agents ||    → Structural → README
+→ Associations   → Anti-patterns  → Dependencies   → Quality gate   → Content    → Banner
+→ Scope          → Version diffs  → Agent prompts  → Repeat         → Functional → GitHub
+→ Raw plan       → Research docs  → Parallelization                 → CI/CD      → Release
+```
+
+**Key design decisions:**
+- **Bypass Permissions ON** — the entire workflow runs headless with agent teams
+- **Sessions can take hours** — large packages (50+ skills) run autonomously
+- **Maximize parallelization** — agent batches run in parallel where dependencies allow
+- **Sequential where necessary** — research before creation, validation after creation
+- **Everything is tested** — no phase is skipped, no output goes unvalidated
+
+---
+
 ## The 7 Phases
 
-### Phase 1: Raw Masterplan (Setup)
+### Phase 1: Bootstrap & Raw Masterplan
 
-**Goal**: Define scope, create infrastructure, establish governance.
+**Goal**: Gather all input, bootstrap a dedicated workspace, identify all topics, and produce a raw masterplan.
+
+**What happens in this phase:**
+You start with a subject — a framework, a software stack, a technology — and you build a dedicated workspace around it. From the subject, all kinds of topics emerge: API areas, configuration patterns, error handling, integrations, deployment, version differences. These topics become the associations you will investigate. The raw masterplan captures ALL of these topics before any deep research begins.
 
 **Steps**:
-1. Configure Claude Code workspace permissions:
+1. **Configure workspace for autonomous operation**:
    - Enable **Bypass Permissions** in project settings (`.claude/settings.json`)
-   - This allows autonomous agent execution without manual approval per tool call
-   - Run: `claude config set bypassPermissions true` or add to `.claude/settings.json`:
+   - This is REQUIRED — the workflow uses agent teams that must run without manual approval
+   - Add to `.claude/settings.json`:
      ```json
      { "permissions": { "allow": ["Bash(*)", "Read", "Write", "Edit", "Glob", "Grep", "WebFetch", "WebSearch", "Agent"] } }
      ```
-2. Define technology scope (name, versions, programming languages involved)
-3. Create preliminary skill inventory (estimate — refined in Phase 3)
-4. Set up repository structure (see Repository Structure below)
-5. Write CLAUDE.md with all 8 governance protocols
-6. Create initial core files (ROADMAP.md, REQUIREMENTS.md, DECISIONS.md, SOURCES.md, etc.)
-7. Record initial architectural decisions in DECISIONS.md
-8. Create raw masterplan in `docs/masterplan/{tech}-masterplan.md`
+2. **Define technology scope** (name, versions, programming languages, ecosystem)
+3. **Identify all topics** — brainstorm every area worth investigating:
+   - Core architecture and design philosophy
+   - API modules, classes, functions
+   - Configuration and setup patterns
+   - Common workflows and use cases
+   - Integration points with other technologies
+   - Error patterns and known pitfalls
+   - Version-specific differences
+4. **Create preliminary skill inventory** (rough estimate — refined in Phase 3)
+5. **Bootstrap repository** with all governance infrastructure:
+   - CLAUDE.md with all protocols (P-000a through P-010)
+   - ROADMAP.md, REQUIREMENTS.md, DECISIONS.md, SOURCES.md
+   - WAY_OF_WORK.md, LESSONS.md, CHANGELOG.md
+   - Directory structure: `skills/source/`, `docs/masterplan/`, `docs/research/`
+6. **Record initial architectural decisions** in DECISIONS.md
+7. **Write raw masterplan** in `docs/masterplan/{tech}-masterplan.md`
+   - List all identified topics grouped by category
+   - Estimate skill count per category
+   - Note open questions for Phase 2 research
 
-**Output**: Repository with complete infrastructure, raw masterplan
-**Exit Criteria**: All core files created, ROADMAP.md shows Phase 1 complete
+**Output**: Repository with complete infrastructure, raw masterplan with all identified topics
+**Exit Criteria**: All core files created, raw masterplan lists all topics to investigate, ROADMAP.md shows Phase 1 complete
 
 ---
 
 ### Phase 2: Deep Research (Vooronderzoek)
 
-**Goal**: Comprehensive technology investigation before any skill planning.
+**Goal**: Systematically investigate every topic from the raw masterplan. Discover sub-topics, anti-patterns, and version differences that weren't visible during Phase 1.
+
+**What happens in this phase:**
+You take all the topics from your raw masterplan and research them deeply. During this research, you discover MORE topics — sub-topics, edge cases, integration quirks, version-specific gotchas. These discoveries feed back into the masterplan. This is the phase where understanding deepens from "I know this technology exists" to "I understand exactly how it works and where it fails."
 
 **Steps**:
 1. Read SOURCES.md for approved documentation URLs
-2. Research technology systematically:
+2. Research EVERY topic from the raw masterplan systematically:
    - Architecture and design philosophy
    - Complete API surface (all modules, classes, methods)
    - Version matrix (breaking changes across versions)
@@ -63,36 +110,52 @@ This document defines the **7-phase research-first methodology** for building de
    - Anti-patterns from real GitHub issues
    - Build and deployment considerations
 3. Use WebFetch to verify against latest official documentation
-4. Minimum 2000 words, aim for comprehensive coverage
-5. Update SOURCES.md with verification dates
+4. **Capture new sub-topics** discovered during research — these feed Phase 3
+5. Minimum 2000 words, aim for comprehensive coverage
+6. Update SOURCES.md with verification dates
 
 **Output**: `docs/research/vooronderzoek-{tech}.md`
-**Exit Criteria**: All major API areas documented, version differences mapped, anti-patterns identified
+**Exit Criteria**: All major API areas documented, version differences mapped, anti-patterns identified, newly discovered sub-topics noted for Phase 3
 
 ---
 
 ### Phase 3: Masterplan Refinement
 
-**Goal**: Transform raw plan into executable skill inventory based on research findings.
+**Goal**: Transform the raw plan into a precise, executable masterplan. Define sub-phases, dependencies, parallelization strategy, and complete agent prompts. After this phase, the masterplan is the blueprint — execution is mechanical.
+
+**What happens in this phase:**
+The research from Phase 2 revealed new sub-topics and changed your understanding of the technology. Now you incorporate everything into a refined masterplan. You decide which skills to merge, add, or remove. You define the exact execution order: which skills can be built in parallel (same batch), which must be sequential (dependency chain). You write complete agent prompts so that Phase 5 can run autonomously for hours without human intervention.
 
 **Steps**:
 1. Review vooronderzoek against Phase 1 skill inventory
-2. Merge redundant skills (research reveals overlaps)
-3. Add missing skills (research reveals gaps)
+2. **Incorporate discoveries**: Add skills for new sub-topics found in Phase 2
+3. Merge redundant skills (research reveals overlaps)
 4. Remove unnecessary skills (API too thin for standalone skill)
-5. Define skill dependencies and execution order
-6. Organize into batches (3 skills per batch, dependency-aware)
-7. Write ready-to-execute agent prompts for each skill
+5. **Define dependency graph**: Which skills depend on which? (foundation → syntax → impl → errors → agents)
+6. **Organize into parallel batches** (3 agents per batch):
+   - Group independent skills into the same batch (parallelizable)
+   - Mark sequential dependencies between batches
+   - Estimate total batches and runtime
+7. **Write complete agent prompts** for EVERY skill:
+   - Output directory path
+   - Files to create (SKILL.md + references/)
+   - YAML frontmatter with description
+   - Scope bullets
+   - Research section references
+   - Quality rules
 8. Record new decisions in DECISIONS.md
 
-**Output**: Updated `docs/masterplan/{tech}-masterplan.md` (definitive)
-**Exit Criteria**: Final skill count, batch plan with dependencies, all agent prompts ready
+**Output**: Updated `docs/masterplan/{tech}-masterplan.md` (definitive, executable)
+**Exit Criteria**: Final skill count, batch plan with dependency graph, ALL agent prompts ready to execute headlessly
 
 ---
 
 ### Phase 4: Topic-Specific Research
 
-**Goal**: Focused research per skill, concurrent with Phase 5.
+**Goal**: Deep-dive research per skill or skill group, ensuring every detail is verified before building.
+
+**What happens in this phase:**
+The refined masterplan identifies exactly which skills to build. Some skills cover complex areas that need additional focused research beyond what Phase 2 provided. This phase runs concurrently with Phase 5: research a batch, build those skills, research the next batch.
 
 **Steps**:
 1. For each skill (or batch): create focused research document
@@ -104,17 +167,31 @@ This document defines the **7-phase research-first methodology** for building de
 **Output**: `docs/research/topic-research/{skill-name}-research.md`
 **Exit Criteria**: Research sufficient for deterministic skill creation
 
-**Note**: This phase runs concurrently with Phase 5. Research a batch, create the skills, research next batch.
+**Note**: This phase runs concurrently with Phase 5. Research a batch → build those skills → research next batch → build → repeat.
 
 ---
 
 ### Phase 5: Skill Creation
 
-**Goal**: Transform research into deterministic skills using parallel agents.
+**Goal**: Build all skills using parallel agent teams. This is the production phase — the masterplan is the blueprint, agents execute it.
+
+**What happens in this phase:**
+This is where the actual building happens. The masterplan from Phase 3 contains complete agent prompts for every skill. You spawn agent teams (3 agents per batch), each agent builds one skill autonomously. After every batch, a quality gate validates the output. If something fails, a fix-agent corrects it. This phase can run for hours without human intervention — that's why bypass permissions and complete agent prompts are essential.
+
+**Execution model:**
+```
+Batch 1: [Agent A: core-skill-1] [Agent B: core-skill-2] [Agent C: core-skill-3]
+          ↓ quality gate ↓
+Batch 2: [Agent A: syntax-skill-1] [Agent B: syntax-skill-2] [Agent C: syntax-skill-3]
+          ↓ quality gate ↓
+Batch 3: [Agent A: impl-skill-1] [Agent B: impl-skill-2] [Agent C: impl-skill-3]
+          ↓ quality gate ↓
+...repeat until all skills built...
+```
 
 **Steps**:
 1. Execute in batches of 3 agents (optimal parallelism for Claude Code Agent tool)
-2. Each agent receives:
+2. Each agent receives the complete prompt from the masterplan:
    - Research document (Phase 4 output)
    - REQUIREMENTS.md quality criteria
    - SOURCES.md approved URLs
@@ -123,36 +200,52 @@ This document defines the **7-phase research-first methodology** for building de
 3. Quality gate AFTER every batch (see Quality Gate Checklist below)
 4. If validation fails: spawn fix-agent with specific corrections, re-validate
 5. NEVER accept below REQUIREMENTS.md quality bar
+6. Commit after every batch — work that isn't committed doesn't exist
 
 **Output**: `skills/source/{prefix}-{category}/{skill-name}/`
 **Exit Criteria**: All skills created and validated per batch
 
 ---
 
-### Phase 6: Validation
+### Phase 6: Validation & Audit
 
-**Goal**: Comprehensive quality assurance across all skills.
+**Goal**: Structural, content, and functional testing of everything that was built. Nothing ships without being tested.
+
+**What happens in this phase:**
+Everything that was built in Phase 5 gets systematically tested. The CI/CD pipeline runs automated checks (frontmatter, line count, structure, language). A compliance audit checks all 7 phases for methodology adherence. Functional testing verifies that skills actually work when Claude uses them. Issues are fixed and re-validated until the quality bar is met.
 
 **Steps**:
-1. **Structural validation**:
+1. **Automated CI/CD validation** (run locally or via GitHub Actions):
+   ```bash
+   node scripts/validate-frontmatter.js /path/to/package
+   node scripts/validate-line-count.js /path/to/package
+   node scripts/validate-structure.js /path/to/package
+   node scripts/validate-language.js /path/to/package
+   node scripts/generate-audit-report.js /path/to/package
+   ```
+2. **Structural validation**:
    - YAML frontmatter valid (name, description with trigger words)
    - SKILL.md < 500 lines
    - Reference files present (methods.md, examples.md, anti-patterns.md)
    - File paths correct
-2. **Content validation**:
+3. **Content validation**:
    - English-only
    - Deterministic language (ALWAYS/NEVER, no "you might consider")
    - No hallucinated APIs
    - Version-explicit code examples
-3. **Cross-reference validation**:
+4. **Cross-reference validation**:
    - Skills reference each other correctly
    - No broken links
-4. **Functional validation**:
+5. **Functional validation**:
    - Test skills by asking Claude realistic questions
    - Verify generated code matches skill guidance
+6. **Compliance audit** (P-010):
+   - Run the methodology audit from `templates/methodology-audit.md.template`
+   - Target: ≥ 90% compliance score
+   - Auto-remediate fixable issues
 
-**Output**: Validation report, all issues resolved
-**Exit Criteria**: Zero blocking issues
+**Output**: Validation report, audit report, all issues resolved
+**Exit Criteria**: Zero blocking issues, compliance score ≥ 90%
 
 ---
 
@@ -384,13 +477,23 @@ description: "Documents the ifcopenshell.api module system with all 30+ API modu
 
 ## Orchestration Model
 
+### Headless Agent Teams
+
+This workflow is designed for **autonomous, headless operation**. A complete skill package (20-70 skills) can take 1-8 hours to build. The user provides direction, the system executes.
+
+**Prerequisites for headless operation:**
+- **Bypass Permissions: ON** — agents must run without per-tool approval
+- **Complete agent prompts** — every skill has a ready-to-execute prompt in the masterplan
+- **Quality gates are automated** — no human judgment needed between batches
+- **Commits after every batch** — recovery is always possible
+
 ### Meta-Orchestrator Pattern
 The Claude Code session + human user = **BRAIN** (thinks, plans, validates)
 Agents = **HANDS** (research, write, validate — the actual work)
 
 ### What the orchestrator does:
 - **THINK**: Analyze problems, design solutions
-- **STRATEGIZE**: Plan batches, define task decomposition
+- **STRATEGIZE**: Plan batches, define task decomposition, maximize parallelization
 - **COMPOSE**: Write agent prompts with core file references
 - **VALIDATE**: Assess output against REQUIREMENTS.md
 - **DECIDE**: Accept or respawn with corrections
@@ -407,11 +510,14 @@ Agents = **HANDS** (research, write, validate — the actual work)
 4. **Quality rules** inline (English-only, <500 lines, deterministic)
 5. **Source URLs** from SOURCES.md
 
-### Batch Strategy:
+### Parallelization Strategy:
 - 3 agents per batch (optimal for Claude Code Agent tool)
 - Separated file scopes (NEVER two agents on same file)
 - Quality gate after every batch
 - Dependency-aware ordering (foundation skills first)
+- **Parallel**: Independent skills in the same batch (e.g., 3 syntax skills)
+- **Sequential**: Dependent skills in different batches (e.g., core before impl)
+- **Concurrent phases**: Phase 4 research runs interleaved with Phase 5 creation
 
 ---
 
@@ -582,6 +688,22 @@ Update ROADMAP.md next steps (CRITICAL for session recovery). Commit all changes
 
 ### P-008: Inter-Agent
 Agents spawned via Claude Code Agent tool. Results collected automatically.
+
+### P-010: Self-Audit
+Run compliance audit using `templates/methodology-audit.md.template`. CI/CD validates automatically on push.
+
+---
+
+## Cross-Technology Boundary Skills
+
+For stacks that combine multiple technologies (e.g., IFC + Three.js, Speckle + Blender, QGIS + BIM), cross-tech skills address the integration boundaries:
+
+- Each technology package remains **standalone and independently installable**
+- Cross-tech skills describe EXACTLY ONE technology boundary (e.g., IFC ↔ web-ifc)
+- Cross-tech skills document BOTH sides of the boundary
+- Cross-tech skills live in: `Cross-Tech-AEC-Claude-Skill-Package`
+- They reference skills in the source packages, never duplicate content
+- Should be built LAST — they depend on the individual technology packages being complete
 
 ---
 
