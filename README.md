@@ -1,21 +1,40 @@
 # Skill Package Workflow Template
 
-> Geconsolideerde workflow voor het bouwen van deterministic Claude skill packages.
-> Bewezen in 3 productiepakketten: ERPNext (28 skills), Blender-Bonsai (73 skills), Tauri 2 (27 skills).
+> Geconsolideerde 7-fase methodologie voor het bouwen van deterministic Claude skill packages.
+> Bewezen in 10+ productiepakketten met 311+ skills. Inclusief CI/CD quality pipeline.
 
 ## Wat is dit?
 
 Dit is het **template-repository** van de OpenAEC Foundation voor het ontwikkelen van Claude skill packages. Het bevat:
 
-- **WORKFLOW.md** — De complete 7-fase methodologie
-- **templates/** — Template-versies van alle core bestanden
-- Referenties naar voltooide pakketten als voorbeeld
+- **WORKFLOW.md** — De complete 7-fase research-first methodologie
+- **templates/** — Template-versies van alle core bestanden (CLAUDE.md, SKILL.md, ROADMAP.md, etc.)
+- **scripts/** — CI/CD validatiescripts (frontmatter, line count, structuur, taal)
+- **.github/workflows/** — Reusable GitHub Actions workflow voor automatische kwaliteitsvalidatie
+- **HANDOFF-ECOSYSTEEM.md** — Centrale overdracht voor alle openstaande werkpakketten
+
+## De 7-Fase Methodologie
+
+```
+Phase 1          Phase 2          Phase 3          Phase 4+5         Phase 6      Phase 7
+BOOTSTRAP &      DEEP             MASTERPLAN       TOPIC RESEARCH    VALIDATION   PUBLICATION
+RAW MASTERPLAN   RESEARCH         REFINEMENT       + SKILL CREATION  + AUDIT      + RELEASE
+
+Gather input     Investigate      Finalize plan    Build in batches  Test         Ship
+→ Topics         → Sub-topics     → Dependencies   → 3 agents ||    → CI/CD      → README
+→ Workspace      → Anti-patterns  → Agent prompts  → Quality gate   → Audit      → Banner
+→ Raw plan       → Research docs  → Parallelization → Repeat        → Fix        → GitHub
+```
+
+**Kernprincipes:**
+- **Bypass Permissions ON** — de workflow draait headless met agent teams
+- **Sessies kunnen uren duren** — grote packages (50+ skills) draaien autonoom
+- **Maximale parallelisatie** — agent batches draaien parallel waar dependencies het toelaten
+- **Alles wordt getest** — geen fase wordt overgeslagen, geen output gaat ongevalideerd door
 
 ## Hoe te gebruiken
 
-### Stap 1: Repository klaarzetten
-
-Gebruik het `init-repo.md` script of maak handmatig:
+### Stap 1: Repository bootstrappen
 
 ```bash
 mkdir {Tech}-Claude-Skill-Package
@@ -25,86 +44,116 @@ git init
 
 ### Stap 2: Core bestanden kopiëren
 
-Kopieer de templates uit `templates/` en pas aan voor jouw technologie:
+Kopieer de templates uit `templates/` en vervang `{{TECH_*}}` placeholders:
 
-1. `CLAUDE.md` — Vervang `{{TECH_*}}` placeholders
-2. `ROADMAP.md` — Stel Phase 1 status in
-3. `REQUIREMENTS.md` — Definieer kwaliteitseisen
-4. `DECISIONS.md` — Noteer eerste beslissingen
-5. `SOURCES.md` — Voeg officiële documentatie URLs toe
-6. `WAY_OF_WORK.md` — Referentie naar WORKFLOW.md
-7. Overige bestanden
+1. `CLAUDE.md` — Governance protocols (P-000a t/m P-010)
+2. `ROADMAP.md` — Status tracking
+3. `REQUIREMENTS.md` — Kwaliteitseisen
+4. `DECISIONS.md` — Architectuurbeslissingen
+5. `SOURCES.md` — Goedgekeurde documentatie URLs
+6. `WAY_OF_WORK.md` — Methodologie referentie
+7. Overige: LESSONS.md, CHANGELOG.md, .gitignore
 
-### Stap 3: Start een Claude Code sessie
-
-Open de repository in je IDE/terminal en start Claude Code:
+### Stap 3: Start Claude Code
 
 ```bash
 cd {Tech}-Claude-Skill-Package
 claude
+# Typ: "Lees START-PROMPT.md" of "Lees CLAUDE.md en begin"
 ```
 
-Claude leest automatisch `CLAUDE.md` en weet:
-- Welke fase actief is (uit ROADMAP.md)
-- Welke protocollen gelden
-- Hoe skills gebouwd moeten worden
-- Waar bronnen te vinden zijn
+Claude leest automatisch `CLAUDE.md` en weet welke fase actief is, welke protocollen gelden, en hoe skills gebouwd moeten worden.
 
 ### Stap 4: Doorloop de 7 fases
 
-Claude volgt de protocollen uit CLAUDE.md:
+| Fase | Wat er gebeurt | Jouw rol |
+|------|---------------|----------|
+| **1. Bootstrap & Raw Masterplan** | Input verzamelen, topics identificeren, workspace opzetten, raw plan | Review topics |
+| **2. Deep Research** | Alle topics onderzoeken, sub-topics ontdekken | Wacht af |
+| **3. Masterplan Refinement** | Plan verfijnen, batches definiëren, agent prompts schrijven | Review finale plan |
+| **4. Topic Research** | Per-batch focused onderzoek | Optioneel |
+| **5. Skill Creation** | Agent teams bouwen skills (3 parallel, quality gate per batch) | Monitor |
+| **6. Validation & Audit** | CI/CD pipeline, compliance audit, functionele tests | Check rapport |
+| **7. Publication** | README, INDEX, banner, GitHub release, compliance audit ≥ 90% | Approve push |
 
-| Fase | Wat Claude doet | Jouw rol |
-|------|-----------------|----------|
-| **1. Raw Masterplan** | Maakt skill inventory, stelt structuur op | Review en goedkeuring |
-| **2. Deep Research** | Onderzoekt technologie via WebFetch | Wacht af, check resultaat |
-| **3. Masterplan Refinement** | Verfijnt skills, definieert batches | Review finale lijst |
-| **4. Topic Research** | Per-skill onderzoek | Optioneel meekijken |
-| **5. Skill Creation** | Maakt skills via parallel agents | Quality gate per batch |
-| **6. Validation** | Valideert alle skills | Check steekproef |
-| **7. Publication** | README, INDEX, banner, GitHub push | Approve final push |
+## CI/CD Quality Pipeline
 
-### Stap 5: Publicatie
+Automatische validatie bij elke push/PR. Andere repos gebruiken deze workflow via:
 
-Na fase 7 heb je:
-- Een publieke GitHub repo onder OpenAEC Foundation
-- Social preview banner
-- Release tag (v1.0.0)
-- Compleet README met installatie-instructies
+```yaml
+# .github/workflows/quality.yml
+name: Skill Quality
+on: [push, pull_request]
+jobs:
+  quality:
+    uses: OpenAEC-Foundation/Skill-Package-Workflow-Template/.github/workflows/skill-quality.yml@main
+```
 
-## Tips voor efficiënt werken
+**Wat het valideert:**
+- YAML frontmatter (required fields, folded scalar `>`, "Use when..." triggers)
+- Line count (SKILL.md < 500 regels)
+- Directory structuur conventie
+- English-only content
+- Compliance score (≥ 90% = pass)
 
-1. **Laat Claude delegeren** — De meta-orchestrator delegeert al het werk naar agents
-2. **Vertrouw de kwaliteitspoorten** — Na elke batch wordt gevalideerd
-3. **Eén sessie per fase** — Grote pakketten: splits over meerdere sessies
-4. **ROADMAP.md is heilig** — Claude leest dit bij elke sessie-start
-5. **Push na elke fase** — Werk dat niet gepusht is, bestaat niet
+**Lokaal testen:**
+```bash
+node scripts/validate-frontmatter.js /pad/naar/package
+node scripts/generate-audit-report.js /pad/naar/package
+```
 
 ## Complete Stack (OpenAEC Foundation)
 
-| Package | Technologie | Status |
-|---------|------------|--------|
-| ERPNext | ERPNext/Frappe ERP | ✅ Compleet (28 skills) |
-| Blender-Bonsai | Blender, IfcOpenShell, Bonsai, Sverchok | ✅ Compleet (73 skills) |
-| Tauri 2 | Tauri 2.x desktop/mobile framework | ✅ Compleet (27 skills) |
-| n8n | Workflow automation | ⏳ Klaar voor start |
-| Docker | Containerization | ⏳ Klaar voor start |
-| Nextcloud | Cloud platform | ⏳ Klaar voor start |
-| React | UI component library | ⏳ Klaar voor start |
-| Vite | Frontend build tool | ✅ Compleet (22 skills) |
-| SolidJS | Reactive UI framework | ⏳ Klaar voor start |
-| Fluent-i18n | Mozilla i18n system | ⏳ Klaar voor start |
-| pdf-lib | PDF creation library | ⏳ Klaar voor start |
-| PDF.js | PDF viewer library | ⏳ Klaar voor start |
-| ThatOpenCompany | BIM/3D ecosystem | ⏳ Assessment |
-| Cross-Platform | Design, integration patterns | ⏳ Gepland |
+### Afgerond — 311 skills gepubliceerd
+
+| Package | Technologie | Skills | GitHub |
+|---------|------------|--------|--------|
+| Blender-Bonsai | Blender, IfcOpenShell, Bonsai, Sverchok | 73 | [Link](https://github.com/OpenAEC-Foundation/Blender-Bonsai-ifcOpenshell-Sverchok-Claude-Skill-Package) |
+| ERPNext | ERPNext/Frappe ERP | 28 | [Link](https://github.com/OpenAEC-Foundation/ERPNext_Anthropic_Claude_Development_Skill_Package) |
+| Tauri 2 | Tauri 2.x desktop/mobile | 27 | [Link](https://github.com/OpenAEC-Foundation/Tauri-2-Claude-Skill-Package) |
+| Nextcloud | Cloud platform / WebDAV | 24 | [Link](https://github.com/OpenAEC-Foundation/Nextcloud-Claude-Skill-Package) |
+| React | React 18/19 UI library | 24 | [Link](https://github.com/OpenAEC-Foundation/React-Claude-Skill-Package) |
+| Draw.io | Diagramming / diagrams.net | 22 | [Link](https://github.com/OpenAEC-Foundation/Draw.io-Claude-Skill-Package) |
+| Vite | Frontend build tool | 22 | [Link](https://github.com/OpenAEC-Foundation/Vite-Claude-Skill-Package) |
+| Docker | Containerization | 22 | [Link](https://github.com/OpenAEC-Foundation/Docker-Claude-Skill-Package) |
+| n8n | Workflow automation | 21 | [Link](https://github.com/OpenAEC-Foundation/n8n-Claude-Skill-Package) |
+| pdf-lib | PDF creation library | 17 | [Link](https://github.com/OpenAEC-Foundation/pdf-lib-Claude-Skill-Package) |
+| Fluent-i18n | Mozilla i18n system | 16 | [Link](https://github.com/OpenAEC-Foundation/Fluent-i18n-Claude-Skill-Package) |
+| PDFjs | PDF viewer library | 15 | [Link](https://github.com/OpenAEC-Foundation/PDFjs-Claude-Skill-Package) |
+
+### In ontwikkeling — 94 skills gepland
+
+| Package | Technologie | Skills gepland | Status |
+|---------|------------|---------------|--------|
+| Speckle | Speckle data platform | 22 | Gebootstrapt |
+| QGIS | GIS / PyQGIS | 19 | Gebootstrapt |
+| Three.js | 3D web development | 19 | Gebootstrapt |
+| ThatOpen | @thatopen/components / web-ifc | 19 | Gebootstrapt |
+| Cross-Tech-AEC | AEC technology boundaries | 15 | Gebootstrapt |
+
+### Gedeeltelijk afgerond
+
+| Package | Status |
+|---------|--------|
+| SolidJS | 6 skills geschreven, impl/errors/agents nog te doen |
+| Docker | 8 skills geschreven, impl/errors/agents nog te doen |
+
+## Templates
+
+| Template | Doel |
+|----------|------|
+| `CLAUDE.md.template` | Governance protocols (P-000a t/m P-010) |
+| `SKILL.md.template` | YAML frontmatter + skill structuur |
+| `masterplan.md.template` | Uitvoeringsplan met agent prompts |
+| `methodology-audit.md.template` | Compliance audit + auto-remediation |
+| `ROADMAP.md.template` | Status tracking |
+| + 7 meer | REQUIREMENTS, DECISIONS, SOURCES, LESSONS, WAY_OF_WORK, CHANGELOG, social-preview |
 
 ## Referenties
 
 - [WORKFLOW.md](WORKFLOW.md) — De complete 7-fase methodologie
-- [ERPNext Package](https://github.com/OpenAEC-Foundation/ERPNext_Anthropic_Claude_Development_Skill_Package)
-- [Blender-Bonsai Package](https://github.com/OpenAEC-Foundation/Blender-Bonsai-ifcOpenshell-Sverchok-Claude-Skill-Package)
-- [Tauri 2 Package](https://github.com/OpenAEC-Foundation/Tauri-2-Claude-Skill-Package)
+- [HANDOFF-ECOSYSTEEM.md](HANDOFF-ECOSYSTEEM.md) — Overdracht voor alle openstaande werkpakketten
+- [REPO-STATUS-AUDIT.md](REPO-STATUS-AUDIT.md) — Status van alle skill package repos
 
 ## Licentie
 
