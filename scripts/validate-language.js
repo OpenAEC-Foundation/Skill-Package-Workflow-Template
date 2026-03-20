@@ -14,8 +14,8 @@ const DUTCH_WORDS = [
 ];
 
 const FRENCH_WORDS = [
-  "vous", "utiliser", "toujours", "jamais", "exemple",
-  "documentation", "fichier",
+  "vous", "utiliser", "toujours", "jamais", "fichier",
+  "recherche", "configurer",
 ];
 
 const ALL_WORDS = [

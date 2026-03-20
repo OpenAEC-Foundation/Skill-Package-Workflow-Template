@@ -188,27 +188,26 @@ onafhankelijk te schrijven zijn.
 
 ## CI/CD Quality Pipeline (deze repo)
 
-**Status:** Scripts map bestaat, nog niet uitgewerkt als reusable workflow.
+**Status:** GEBOUWD en GETEST — 100% score op Draw.io package (22 skills).
 
-**Te bouwen in `Skill-Package-Workflow-Template/`:**
+**Wat er staat:**
 
 ```
 .github/workflows/
-└── skill-quality.yml          — Reusable workflow
+└── skill-quality.yml          — Reusable GitHub Actions workflow
 
 scripts/
-├── validate-frontmatter.js    — YAML parsing, required fields
+├── validate-frontmatter.js    — YAML parsing, required fields, folded scalar check
 ├── validate-line-count.js     — SKILL.md < 500 regels
-├── validate-references.js     — Broken link detection
 ├── validate-language.js       — English-only body check
 ├── validate-structure.js      — Directory conventie check
-├── generate-audit-report.js   — Compliance score berekening
-└── count-skills.js            — Skill count vs ROADMAP sync
+├── generate-audit-report.js   — Compliance score berekening (≥90% = pass)
+└── count-skills.js            — Skill count per categorie + ROADMAP sync
 ```
 
-**Uitrol per package:**
+**Uitrol per package (7 regels YAML):**
 ```yaml
-# In elke skill package repo: .github/workflows/quality.yml
+# .github/workflows/quality.yml
 name: Skill Quality
 on: [push, pull_request]
 jobs:
@@ -216,42 +215,88 @@ jobs:
     uses: OpenAEC-Foundation/Skill-Package-Workflow-Template/.github/workflows/skill-quality.yml@main
 ```
 
-**Prioriteit:** Quick wins eerst:
-1. YAML frontmatter validatie (vangt 90% van issues)
-2. Line count < 500
-3. Required fields (name, description met "Use when...", license)
-4. Skill count sync met ROADMAP.md
+**Lokaal testen:**
+```bash
+node scripts/validate-frontmatter.js /pad/naar/skill-package
+node scripts/generate-audit-report.js /pad/naar/skill-package
+```
 
 ---
 
-## Workspace Builder (referentie)
+## OpenAEC Workspace Composer — Handoff
 
 **Pad:** `C:\Users\Freek Heijting\Documents\GitHub\OpenAEC-Workspace-Composer\`
 **Status:** Tauri 2 + SolidJS scaffold draait, basis UI en styling aanwezig.
-**Volgende stap:** GitHub API integratie, preset definities, workspace generator.
+**Eigen HANDOFF.md:** Staat in de Composer repo zelf met volledige details.
 
-De presets die gebouwd moeten worden refereren naar de skill packages hierboven:
+### Visie
 
-| Preset | Packages nodig |
+De Workspace Composer is MEER dan een workspace generator. Het is een **complete onboarding UI voor Claude Code** die twee niveaus bedient:
+
+**1. Local workspace level** (per project)
+- Werkmap selecteren via native file picker
+- Skill packages kiezen (presets of handmatig)
+- `.code-workspace` + `.claude/settings.local.json` + skills installatie genereren
+- MCP server configuratie (`.mcp.json`)
+- VS Code openen na generatie
+
+**2. Global level** (~/.claude/)
+- Global commands installeren/beheren (`/publish`, `/deploy`, `/validate`, `/status`)
+- Smart hooks configureren (SessionStart auto-detect workspace type, Stop auto-update ROADMAP)
+- Global permissions instellen (settings.json)
+- Plugin management
+- Effort level defaults
+
+**Kerngedachte:** Je moet geen tech nerd zijn om Claude Code goed in te richten. De UI regelt alles aan de achterkant — op "start" klikken en je bent klaar.
+
+### Presets
+
+| Preset | Skill Packages |
 |--------|---------------|
-| `AEC-GIS-BIM` | Blender-Bonsai, Speckle, QGIS, Three.js, ThatOpen, Cross-Tech-AEC |
-| `BIM-DEVELOPMENT` | Blender-Bonsai, ThatOpen, Three.js, Docker |
 | `OPEN-PDF-STUDIO` | Tauri-2, SolidJS, PDFjs, pdf-lib, Fluent-i18n, Vite |
+| `BIM-DEVELOPMENT` | Blender-Bonsai-IfcOpenShell-Sverchok, ThatOpen, Three.js, Docker |
 | `ERPNEXT-FULLSTACK` | ERPNext, Nextcloud, Docker, n8n, React |
+| `AEC-GIS-BIM` | Blender-Bonsai, Speckle, QGIS, Three.js, ThatOpen, Cross-Tech-AEC |
+
+### Global Commands (te bouwen in de app)
+
+| Command | Wat het doet |
+|---------|-------------|
+| `/publish` | GitHub repo aanmaken, README genereren, release taggen, social preview |
+| `/deploy` | Skill package naar GitHub pushen + CI/CD activeren |
+| `/validate` | Lokale audit draaien met de CI/CD scripts |
+| `/status` | Overzicht van alle actieve skills, MCP servers, plugins |
+| `/workspace-info` | Huidige workspace configuratie tonen |
+
+### Smart Hooks (configureerbaar via de app)
+
+| Hook | Trigger | Actie |
+|------|---------|-------|
+| Auto-detect workspace | SessionStart | Herkent of het een skill package, dev project, of ERP project is en laadt juiste config |
+| Auto-effort | SessionStart | Stelt effort in op basis van ROADMAP fase (research=high, creation=medium, validation=low) |
+| ROADMAP sync | Stop | Updatet ROADMAP.md automatisch bij sessie-einde |
+| Safety check | PreToolUse | Waarschuwt bij gevaarlijke operaties in productie-contexten |
+
+### Integratie met CI/CD
+
+De Composer app kan de validatiescripts uit deze repo hergebruiken:
+- Compliance score per package tonen in de UI
+- Validatie draaien voordat een workspace wordt gegenereerd
+- Badge/status indicator per skill package
 
 ---
 
 ## Aanbevolen werkvolgorde
 
 ```
-1. CI/CD pipeline bouwen          ← deze repo, schaalt alles
+1. CI/CD pipeline bouwen          ← DONE (deze repo)
 2. Speckle package uitwerken      ← first-mover, hoge prioriteit
 3. QGIS package uitwerken         ← first-mover, hoge prioriteit
 4. ThatOpen package uitwerken     ← 6 skills als basis
 5. Three.js package uitwerken     ← 1 skill als basis
 6. Cross-Tech-AEC core skills     ← kan parallel met 2-5
 7. Cross-Tech-AEC impl skills     ← na 2-5 afgerond
-8. Workspace Builder presets      ← na alle packages klaar
+8. Workspace Composer afbouwen    ← parallel met packages
 ```
 
 ---
