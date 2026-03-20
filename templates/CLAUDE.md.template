@@ -27,6 +27,8 @@
 
 **Consolidate lessons**: Any workflow-level insight (not tech-specific) should also be noted for consolidation back to the Workflow Template repo (`C:\Users\Freek Heijting\Documents\GitHub\Skill-Package-Workflow-Template`).
 
+**Self-audit**: At Phase 6 or any time quality is in question, use Protocol P-010 to run a self-audit against the methodology. The audit template and CI/CD pipeline are in the Workflow Template repo.
+
 **Masterplan template**: When creating your masterplan in Phase 3, follow the EXACT structure from:
 - Template: `C:\Users\Freek Heijting\Documents\GitHub\Skill-Package-Workflow-Template\templates\masterplan.md.template`
 - Proven example: `C:\Users\Freek Heijting\Documents\GitHub\Tauri-2-Claude-Skill-Package\docs\masterplan\tauri-masterplan.md` (27 skills, 10 batches, executed in one session)
@@ -62,6 +64,8 @@ The masterplan must include: refinement decisions table, skill inventory with ex
 | CHANGELOG.md | History | Version history in Keep a Changelog format |
 | docs/masterplan/{{TECH_PREFIX}}-masterplan.md | Planning | Execution plan with phases, prompts, dependencies |
 | README.md | Public | GitHub landing page |
+| HANDOFF.md | Overdracht | Quick-start guide for new sessions, batch volgorde, bijzonderheden |
+| INDEX.md | Catalog | Complete skill catalog with descriptions and dependency graph |
 
 ## Technology Scope
 | Tech | Prefix | Versions |
@@ -258,6 +262,30 @@ Defined in detail in **WAY_OF_WORK.md** and **REQUIREMENTS.md**. Quick reference
 - Naming: `{{TECH_PREFIX}}-{category}-{topic}`
 - Verify against **SOURCES.md** approved URLs only
 
+### SKILL.md YAML Frontmatter — Required Format
+
+```yaml
+---
+name: {{PREFIX}}-{{CATEGORY}}-{{TOPIC}}
+description: >
+  Use when [specific trigger scenario].
+  Prevents the [common mistake / anti-pattern].
+  Covers [key topics, API areas, version differences].
+  Keywords: [comma-separated technical terms].
+license: MIT
+compatibility: "Designed for Claude Code. Requires {{TECHNOLOGY}} {{VERSIONS}}."
+metadata:
+  author: OpenAEC-Foundation
+  version: "1.0"
+---
+```
+
+**CRITICAL FORMAT RULES:**
+- Description MUST use folded block scalar `>` (NEVER quoted strings)
+- Description MUST start with "Use when..."
+- Description MUST include "Keywords:" line
+- Name MUST be kebab-case, max 64 characters
+
 ---
 
 ## Reflection Checkpoint Protocol (P-006a)
@@ -344,3 +372,33 @@ git push origin v1.0.0
 gh release create v1.0.0 --title "v1.0.0 — {{TECH_FULL_NAME}} Skill Package" \
   --notes "Initial release with X deterministic skills across 5 categories."
 ```
+
+---
+
+## Self-Audit Protocol (P-010)
+
+When a skill package reaches Phase 6 (Validation) or when requested, run a self-audit.
+
+### How to audit:
+1. Read the methodology audit template from the Workflow Template repo:
+   `C:\Users\Freek Heijting\Documents\GitHub\Skill-Package-Workflow-Template\templates\methodology-audit.md.template`
+2. Read the repo status overview for cross-package context:
+   `C:\Users\Freek Heijting\Documents\GitHub\Skill-Package-Workflow-Template\REPO-STATUS-AUDIT.md`
+3. Or use the ready-made audit prompt:
+   `C:\Users\Freek Heijting\Documents\GitHub\Skill-Package-Workflow-Template\AUDIT-START-PROMPT.md`
+
+### CI/CD Automated Validation:
+Skill packages with GitHub remotes automatically run quality checks on push/PR via:
+```yaml
+# .github/workflows/quality.yml
+name: Skill Quality
+on: [push, pull_request]
+jobs:
+  quality:
+    uses: OpenAEC-Foundation/Skill-Package-Workflow-Template/.github/workflows/skill-quality.yml@main
+```
+
+This validates: YAML frontmatter, line count, directory structure, English-only content, and generates a compliance score.
+
+### Manual Full Audit:
+For a comprehensive audit + auto-remediation, copy the prompt from `AUDIT-START-PROMPT.md` and run it in the target repo's Claude Code session.

@@ -1,0 +1,24 @@
+{
+  "name": "skill-package-workflow-template",
+  "version": "1.0.0",
+  "description": "> Geconsolideerde workflow voor het bouwen van deterministic Claude skill packages. > Bewezen in 3 productiepakketten: ERPNext (28 skills), Blender-Bonsai (73 skills), Tauri 2 (27 skills).",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OpenAEC-Foundation/Skill-Package-Workflow-Template.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/OpenAEC-Foundation/Skill-Package-Workflow-Template/issues"
+  },
+  "homepage": "https://github.com/OpenAEC-Foundation/Skill-Package-Workflow-Template#readme",
+  "dependencies": {
+    "puppeteer": "^24.40.0"
+  }
+}

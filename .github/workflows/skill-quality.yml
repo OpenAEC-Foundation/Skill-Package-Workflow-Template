@@ -1,0 +1,55 @@
+name: Skill Package Quality Validation
+
+on:
+  # Reusable by other repos
+  workflow_call:
+
+  # Also run on push/PR for this repo itself
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    name: Quality Checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout calling repo
+        uses: actions/checkout@v4
+        with:
+          path: repo
+
+      - name: Checkout template repo (scripts)
+        uses: actions/checkout@v4
+        with:
+          repository: OpenAEC-Foundation/Skill-Package-Workflow-Template
+          ref: main
+          path: template
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Validate frontmatter
+        run: node template/scripts/validate-frontmatter.js repo
+
+      - name: Validate line count
+        run: node template/scripts/validate-line-count.js repo
+
+      - name: Validate structure
+        run: node template/scripts/validate-structure.js repo
+
+      - name: Validate language
+        run: node template/scripts/validate-language.js repo
+
+      - name: Count skills (informational)
+        run: node template/scripts/count-skills.js repo
+
+      - name: Generate audit report
+        if: always()
+        run: |
+          node template/scripts/generate-audit-report.js repo > audit-report.md
+          cat audit-report.md >> "$GITHUB_STEP_SUMMARY"
