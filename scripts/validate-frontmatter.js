@@ -103,11 +103,19 @@ for (const file of files) {
 
   const { raw, fields } = fm;
 
-  // 2. Required fields
-  for (const req of ["name", "description", "license"]) {
+  // 2. Required fields (agentskills standard)
+  for (const req of ["name", "description", "license", "compatibility"]) {
     if (!fields[req]) {
       issues.push(`Missing required field: ${req}`);
     }
+  }
+
+  // 2a. metadata.author + metadata.version (raw-grep, parser is flat)
+  if (!/^\s*author:\s*\S/m.test(raw)) {
+    issues.push(`Missing metadata.author`);
+  }
+  if (!/^\s*version:\s*["']?\d/m.test(raw)) {
+    issues.push(`Missing metadata.version (must be string like "1.0")`);
   }
 
   // 3. name: kebab-case, max 64 chars
@@ -140,9 +148,29 @@ for (const file of files) {
     }
   }
 
-  // 7. license is MIT
-  if (fields.license && fields.license !== "MIT") {
-    issues.push(`license must be "MIT" (found: "${fields.license}")`);
+  // 7. license is recognized SPDX identifier (matches repo LICENSE)
+  const allowedLicenses = ["MIT", "Apache-2.0", "LGPL-3.0", "BSD-3-Clause", "GPL-3.0"];
+  if (fields.license && !allowedLicenses.includes(fields.license)) {
+    issues.push(`license must be one of ${allowedLicenses.join(", ")} (found: "${fields.license}")`);
+  }
+
+  // 8. compatibility quoted-string convention
+  if (fields.compatibility && fields.compatibility.length < 20) {
+    issues.push(`compatibility too thin (must mention "Claude Code" + technology + versions)`);
+  }
+
+  // 9. Keywords entries minimum count (rough check : ≥ 4 comma-separated terms)
+  // Regex stops at trailing period (sentence terminator) or end of string,
+  // NEVER at internal periods inside a term (e.g. "tailwind.config.js" is one term).
+  // Detect trailing period as: period immediately followed by end-of-string OR whitespace.
+  if (fields.description) {
+    const kwMatch = fields.description.match(/Keywords:\s*([\s\S]+?)(?:\.(?=\s*$)|$)/i);
+    if (kwMatch) {
+      const terms = kwMatch[1].split(",").map((s) => s.trim()).filter(Boolean);
+      if (terms.length < 4) {
+        issues.push(`Keywords too thin (${terms.length} terms : need >=4 mixing technical + symptom-based + plain-language)`);
+      }
+    }
   }
 
   if (issues.length > 0) {
